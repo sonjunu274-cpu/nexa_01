@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>nexa_01</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#070d16;color:#f4f7fb;overflow:hidden}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+:root{
+ --bg:#070d16;--side:#0b1420;--panel:#111d2c;--panel2:#18263a;--card:#152337;
+ --line:#2c3b50;--text:#f4f7fb;--muted:#8794a8;
+ --blue:#4f7cff;--blueHover:#3f6dea;--purple:#8b63ff;--green:#25c783;--red:#e85c69;--yellow:#e9b84b
+}
+.hide{display:none!important}
+.app{height:100dvh;display:flex;background:var(--bg)}
+.sidebar{width:332px;flex:0 0 332px;background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+.brand{padding:22px 22px 17px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center}
+.logoMini{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#5e76ff,#9b5af4);display:grid;place-items:center;font-size:24px;font-weight:900}
+.brandText b{font-size:21px;display:block}.brandText span{font-size:12px;color:#718096}
+.newChat{margin:18px 16px 12px;width:calc(100% - 32px);border:0;border-radius:12px;padding:14px;background:var(--blue);color:white;font-weight:800;font-size:17px}
+.newChat:hover{background:var(--blueHover)}
+.sideSearch{padding:0 16px 10px}
+.sideSearch input{width:100%;height:40px;border:1px solid var(--line);border-radius:9px;background:#101c2b;color:white;padding:0 12px;outline:0}
+.sideSearch input:focus{border-color:#5e80ff}
+.chatList{flex:1;overflow:auto;padding:3px 10px}
+.chatItem{display:flex;gap:5px;align-items:center;padding:10px 8px;margin:3px 0;border-radius:10px}
+.chatItem:hover,.chatItem.active{background:#1a2a40}
+.chatName{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e8eef7;cursor:pointer}
+.iconBtn{border:0;background:#152338;color:#aebbd0;border-radius:7px;padding:5px 7px}
+.iconBtn:hover{background:#293c57;color:white}
+.sideBottom{border-top:1px solid var(--line);padding:10px}
+.sideBtn{width:100%;border:0;border-radius:9px;background:transparent;color:#dce5f0;text-align:left;padding:11px 12px}
+.sideBtn:hover{background:#162438}
+.sideUser{padding:9px 12px;color:#8d9bb0;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column;background:#060c14}
+.topbar{height:72px;flex:0 0 72px;border-bottom:1px solid var(--line);background:#0b1420;display:flex;align-items:center;padding:0 20px;gap:10px}
+.mobileMenu{display:none;border:1px solid var(--line);background:#16253a;color:white;border-radius:9px;padding:8px 10px}
+.topTitle{flex:1;font-size:20px;font-weight:800}
+.serverStatus{font-size:12px;color:#91a0b4;background:#111e2e;padding:9px 12px;border-radius:9px}
+.chatArea{flex:1;overflow:auto;padding:26px max(14px,calc((100% - 980px)/2)) 18px}
+.welcome{text-align:center;padding:9vh 10px 35px}
+.logoBig{width:92px;height:92px;border-radius:27px;margin:auto;background:linear-gradient(135deg,#5e76ff,#9b5af4);display:grid;place-items:center;font-size:44px;font-weight:900;box-shadow:0 16px 42px #0007}
+.welcome h1{font-size:40px;margin:22px 0 8px}.welcome p{color:#7f8da2;line-height:1.8;font-size:16px}
+.examples{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:18px}
+.example{border:1px solid var(--line);background:#142236;color:#dce5f0;border-radius:10px;padding:10px 12px}
+.example:hover{background:#203451}
+.msg{display:flex;margin:18px 0}.msg.user{justify-content:flex-end}
+.msgInner{max-width:min(850px,95%)}
+.bubble{padding:14px 17px;border-radius:14px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px}
+.user .bubble{background:#2d4f8f;border-bottom-right-radius:5px}
+.assistant .bubble{background:#111d2c;border-bottom-left-radius:5px}
+.meta{font-size:10px;color:#6f7d91;margin-top:5px}
+.sources{margin-top:9px;border:1px solid var(--line);border-radius:10px;background:#0d1724;overflow:hidden}
+.sources summary{cursor:pointer;padding:10px 12px;background:#142135;color:#dce5f0;font-size:12px}
+.source{padding:10px 12px;border-top:1px solid var(--line);font-size:12px;line-height:1.5}
+.source b{display:block;margin-bottom:3px}
+.composer{border-top:1px solid var(--line);background:#08111b;padding:10px 14px 16px}
+.composeBox{max-width:980px;margin:auto;border:1px solid #52627b;border-radius:17px;background:#121e2e;padding:11px;box-shadow:0 14px 40px #0007}
+#question{width:100%;min-height:56px;max-height:170px;resize:none;border:0;outline:0;background:transparent;color:white;padding:5px 8px;font-size:16px}
+#question::placeholder{color:#7e8b9d}
+.composeRow{display:flex;align-items:center;gap:8px}
+.fileBtn,.clearFile,.sendBtn{border:0;border-radius:9px;padding:10px 13px}
+.fileBtn{background:#26364c;color:#edf3fa}.fileBtn:hover{background:#30435e}
+.clearFile{background:#18263a;color:#9ba9bd}
+.sendBtn{margin-left:auto;background:var(--blue);color:white;font-weight:800;min-width:64px}.sendBtn:hover{background:var(--blueHover)}
+.fileName{flex:1;min-width:0;color:#8795aa;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.modalBack{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:15px;z-index:100}
+.modalBack.show{display:flex}
+.modal{width:min(650px,100%);max-height:92dvh;overflow:auto;background:#0e1927;border:1px solid #35465d;border-radius:15px;padding:20px;box-shadow:0 25px 80px #0009}
+.modalHead{display:flex;align-items:center;margin-bottom:16px}.modalHead h2{margin:0;flex:1}
+.close{border:0;background:#1a293d;color:white;border-radius:8px;padding:7px 12px;font-size:18px}
+.field{margin:12px 0}.field label{display:block;color:#91a0b4;font-size:12px;margin-bottom:6px}
+.field input,.field select{width:100%;padding:11px;border:1px solid #35465d;border-radius:9px;background:#09131f;color:white;outline:0}
+.field input:focus{border-color:#6687ff}
+.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.primary,.secondary,.danger{border:0;border-radius:9px;padding:10px 14px}
+.primary{background:var(--blue);color:white;font-weight:800}.secondary{background:#1b2a3e;color:white}.danger{background:#6a2934;color:white}
+.notice{font-size:11px;color:#7f8da2;line-height:1.6}
+.savedList{display:grid;gap:8px}.savedItem{display:flex;align-items:center;gap:8px;padding:11px;border:1px solid var(--line);border-radius:10px;background:#111d2c}
+.savedItem span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+#auth{position:fixed;inset:0;background:radial-gradient(circle at 50% 25%,#1b2d55 0,#0a111d 38%,#050910 100%);z-index:200;display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto}
+.authBox{width:min(460px,96vw);background:#0d1725;border:1px solid #33465e;border-radius:20px;padding:25px;box-shadow:0 25px 90px #0009}
+.authLogo{width:78px;height:78px;margin:0 auto 12px;border-radius:23px;background:linear-gradient(135deg,#5e76ff,#9b5af4);display:grid;place-items:center;font-size:38px;font-weight:900}
+.authBox h1{text-align:center;margin:8px 0 4px;font-size:30px}.authSub{text-align:center;color:#7f8da2;font-size:13px;margin-bottom:20px}
+.authPage{display:none}.authPage.active{display:block}
+.authInput{width:100%;height:45px;margin:6px 0;padding:0 12px;border:1px solid #34465d;border-radius:9px;background:#09131f;color:white;outline:0}
+.authInput:focus{border-color:#6585ff}
+.authMain{width:100%;height:45px;border:0;border-radius:9px;background:var(--blue);color:white;font-weight:800;margin-top:8px}
+.authMain:hover{background:var(--blueHover)}
+.authAlt{width:100%;height:42px;border:0;border-radius:9px;background:#1a293d;color:white;margin-top:8px}
+.authLinks{display:flex;justify-content:center;gap:14px;margin-top:13px}.authLinks button{border:0;background:transparent;color:#91aaff}
+.captchaRow{display:flex;align-items:center;gap:8px;margin:7px 0}.captchaCanvas{width:180px;height:58px;border-radius:8px;background:white;border:1px solid #40526a;flex:0 0 auto}
+.refreshCaptcha{border:0;background:#25364d;color:white;border-radius:8px;padding:9px 10px}
+.authMsg{min-height:18px;color:#ff7d89;font-size:11px;margin-top:8px}
+.strength{height:4px;background:#253246;border-radius:9px;overflow:hidden;margin-top:5px}.strength i{display:block;height:100%;width:0;background:var(--green)}
+
+.toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);background:#202b3a;color:white;border:1px solid #3b4a60;padding:10px 14px;border-radius:9px;display:none;z-index:300;font-size:12px}
+@media(max-width:760px){
+ .sidebar{position:fixed;left:-335px;top:0;bottom:0;z-index:80;transition:left .2s;box-shadow:15px 0 45px #0009}.sidebar.open{left:0}
+ .mobileMenu{display:block}.topbar{height:60px;flex-basis:60px;padding:0 10px}.serverStatus{font-size:10px;padding:8px}.topTitle{font-size:17px}
+ .chatArea{padding:14px 9px}.welcome{padding-top:7vh}.welcome h1{font-size:28px}.welcome p{font-size:13px}.bubble{font-size:14px}.msgInner{max-width:97%}
+ .composer{padding:8px}.composeBox{border-radius:14px}
+ .captchaCanvas{width:150px}
+}
+</style>
+</head>
+<body>
+
+<div id="auth">
+  <div class="authBox">
+    <div class="authLogo">N</div>
+    <h1>nexa_01</h1>
+    <div class="authSub">Search & Knowledge AI</div>
+
+    <div id="loginPage" class="authPage active">
+      <input id="loginId" class="authInput" placeholder="아이디" autocomplete="username">
+      <input id="loginPw" class="authInput" type="password" placeholder="비밀번호" autocomplete="current-password">
+      <button class="authMain" onclick="doLogin()">로그인</button>
+      <button class="authAlt" onclick="showAuth('register')">회원가입</button>
+      <div id="loginMsg" class="authMsg"></div>
+    </div>
+
+    <div id="registerPage" class="authPage">
+      <input id="regId" class="authInput" placeholder="아이디 (3~20자, 영문/숫자/_/-)">
+      <input id="regPw" class="authInput" type="password" placeholder="비밀번호 (4자 이상)">
+      <div class="strength"><i id="pwStrength"></i></div>
+      <input id="regNick" class="authInput" placeholder="닉네임 (2~20자)">
+      <div class="captchaRow">
+        <canvas id="captchaCanvas" class="captchaCanvas" width="360" height="116"></canvas>
+        <button class="refreshCaptcha" onclick="newCaptcha()" title="새 캡챠">↻</button>
+      </div>
+      <input id="regCaptcha" class="authInput" placeholder="위 캡챠 6자리 입력" maxlength="6" autocomplete="off">
+      <button class="authMain" onclick="doRegister()">회원가입</button>
+      <button class="authAlt" onclick="showAuth('login')">로그인으로 돌아가기</button>
+      <div id="regMsg" class="authMsg"></div>
+    </div>
+
+    <div class="notice" style="margin-top:14px;text-align:center">
+      이 버전의 계정은 브라우저 localStorage에 저장되는 데모 계정입니다.
+    </div>
+  </div>
+</div>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logoMini">N</div>
+      <div class="brandText"><b>nexa_01</b><span>Search & Knowledge AI</span></div>
+    </div>
+    <button class="newChat" onclick="newChat()">＋ 새 채팅</button>
+    <div class="sideSearch"><input id="chatSearch" placeholder="채팅 검색"></div>
+    <div class="chatList" id="chatList"></div>
+    <div class="sideBottom">
+      <div class="sideUser" id="sideUser">로그인됨</div>
+      <button class="sideBtn" onclick="savedModal()">▣ 저장된 대화</button>
+      <button class="sideBtn" onclick="profileModal()">● 프로필</button>
+      <button class="sideBtn" onclick="settingsModal()">⚙ 설정</button>
+      <button class="sideBtn" onclick="logout()">↪ 로그아웃</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="mobileMenu" onclick="toggleSidebar()">☰</button>
+      <div class="topTitle" id="chatTitle">새 채팅</div>
+      <div class="serverStatus" id="serverStatus">● luna_01 미연결</div>
+    </header>
+
+    <section class="chatArea" id="chatArea"></section>
+
+    <div class="composer">
+      <div class="composeBox">
+        <textarea id="question" placeholder="nexa_01에게 질문해 보세요…"></textarea>
+        <div class="composeRow">
+          <label class="fileBtn">📎 파일<input id="fileInput" type="file" hidden></label>
+          <button class="clearFile hide" id="clearFile" onclick="clearFile()">× 파일 제거</button>
+          <span class="fileName" id="fileName"></span>
+          <button class="sendBtn" onclick="send()">전송 ↑</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modalBack" id="modalBack"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const APP='nexa_01',SERVER='luna_01',WIKI='https://ko.wikipedia.org/w/api.php',STORE='nexa_01_v2';
+let state=loadState(),captchaText='',pendingFile=null;
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,9)}
+function now(){return new Date().toLocaleString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.style.display='block';clearTimeout(window.__toast);window.__toast=setTimeout(()=>e.style.display='none',1800)}
+function accounts(){try{return JSON.parse(localStorage.getItem('nexa_accounts')||'{}')}catch(e){return{}}}
+function saveAccounts(a){localStorage.setItem('nexa_accounts',JSON.stringify(a))}
+function loadState(){
+  try{
+    const x=JSON.parse(localStorage.getItem(STORE));
+    if(x && x.sessions?.length)return x;
+  }catch(e){}
+  const i=uid();
+  return {
+    profile:{name:'사용자',color:'#ffffff'},
+    api:'',
+    active:i,
+    sessions:[{id:i,title:'새 채팅',messages:[],files:[],pinned:false,updated:now()}]
+  };
+}
+function saveState(){localStorage.setItem(STORE,JSON.stringify(state))}
+function current(){return state.sessions.find(x=>x.id===state.active)||state.sessions[0]}
+function currentUser(){const id=localStorage.getItem('nexa_user');return id?accounts()[id]:null}
+
+async function hashPw(pw){
+  if(window.crypto?.subtle){
+    const data=new TextEncoder().encode(pw),buf=await crypto.subtle.digest('SHA-256',data);
+    return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  }
+  return btoa(unescape(encodeURIComponent(pw)));
+}
+
+function showAuth(page){
+  document.querySelectorAll('.authPage').forEach(x=>x.classList.remove('active'));
+  document.getElementById(page==='login'?'loginPage':'registerPage').classList.add('active');
+  document.getElementById('loginMsg').textContent='';
+  document.getElementById('regMsg').textContent='';
+  if(page==='register')newCaptcha();
+}
+function setAuthMsg(id,t){document.getElementById(id).textContent=t}
+
+function newCaptcha(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+  captchaText='';
+  for(let i=0;i<6;i++)captchaText+=chars[Math.floor(Math.random()*chars.length)];
+  const c=document.getElementById('captchaCanvas'),x=c.getContext('2d'),w=c.width,h=c.height;
+  x.clearRect(0,0,w,h);x.fillStyle='#f5f7fb';x.fillRect(0,0,w,h);
+  for(let i=0;i<80;i++){x.strokeStyle=`rgba(${40+Math.random()*120},${50+Math.random()*120},${80+Math.random()*120},${.12+Math.random()*.35})`;x.beginPath();x.moveTo(Math.random()*w,Math.random()*h);x.lineTo(Math.random()*w,Math.random()*h);x.stroke()}
+  for(let i=0;i<24;i++){x.fillStyle=`rgba(30,50,90,${.15+Math.random()*.45})`;x.beginPath();x.arc(Math.random()*w,Math.random()*h,Math.random()*4+1,0,Math.PI*2);x.fill()}
+  x.textAlign='center';x.textBaseline='middle';
+  for(let i=0;i<6;i++){
+    x.save();x.translate(45+i*55,58);x.rotate((Math.random()-.5)*.45);
+    x.font=`900 ${42+Math.floor(Math.random()*9)}px Arial`;
+    x.fillStyle=['#16253c','#314d7d','#5a356f','#244c46'][Math.floor(Math.random()*4)];
+    x.fillText(captchaText[i],0,0);x.restore();
+  }
+}
+
+async function doRegister(){
+  const id=document.getElementById('regId').value.trim(),pw=document.getElementById('regPw').value;
+  const nick=document.getElementById('regNick').value.trim(),cap=document.getElementById('regCaptcha').value.trim();
+  const a=accounts();
+  if(!/^[A-Za-z0-9_-]{3,20}$/.test(id))return setAuthMsg('regMsg','아이디는 3~20자의 영문/숫자/_/-만 사용할 수 있습니다.');
+  if(pw.length<4)return setAuthMsg('regMsg','비밀번호는 4자 이상 입력하세요.');
+  if(nick.length<2||nick.length>20)return setAuthMsg('regMsg','닉네임은 2~20자로 입력하세요.');
+  if(cap.toLowerCase()!==captchaText.toLowerCase()){setAuthMsg('regMsg','캡챠가 틀렸습니다. 새로고침 후 다시 입력하세요.');newCaptcha();return}
+  if(a[id])return setAuthMsg('regMsg','이미 존재하는 아이디입니다.');
+  a[id]={pw:await hashPw(pw),nick,created:Date.now()};
+  saveAccounts(a);
+  document.getElementById('loginId').value=id;
+  document.getElementById('loginPw').value=pw;
+  showAuth('login');
+  toast('회원가입 완료!');
+}
+
+async function doLogin(){
+  const id=document.getElementById('loginId').value.trim(),pw=document.getElementById('loginPw').value,a=accounts();
+  if(!a[id])return setAuthMsg('loginMsg','존재하지 않는 아이디입니다.');
+  if(a[id].pw!==await hashPw(pw))return setAuthMsg('loginMsg','아이디 또는 비밀번호가 틀렸습니다.');
+  localStorage.setItem('nexa_user',id);
+  state.profile.name=a[id].nick||'사용자';saveState();
+  document.getElementById('auth').classList.add('hide');
+  render();checkServer();
+  toast('로그인되었습니다.');
+}
+function logout(){localStorage.removeItem('nexa_user');document.getElementById('auth').classList.remove('hide');showAuth('login')}
+function ensureLogin(){if(!currentUser()){document.getElementById('auth').classList.remove('hide');showAuth('login');return false}return true}
+
+function newChat(){
+  if(!ensureLogin())return;
+  const i=uid();state.sessions.unshift({id:i,title:'새 채팅',messages:[],files:[],pinned:false,updated:now()});
+  state.active=i;saveState();render();toggleSidebar(false);
+}
+function selectChat(i){state.active=i;saveState();render();toggleSidebar(false)}
+function pinChat(i){const s=state.sessions.find(x=>x.id===i);if(!s)return;s.pinned=!s.pinned;s.updated=now();saveState();renderList()}
+function renameChat(i){
+  const s=state.sessions.find(x=>x.id===i);if(!s)return;
+  openModal(`<div class="modalHead"><h2>채팅 이름 변경</h2><button class="close" onclick="closeModal()">×</button></div>
+  <div class="field"><label>새 이름</label><input id="renameInput" value="${esc(s.title)}"></div>
+  <div class="actions"><button class="secondary" onclick="closeModal()">취소</button><button class="primary" onclick="applyRename('${i}')">저장</button></div>`);
+  setTimeout(()=>document.getElementById('renameInput').focus(),30);
+}
+function applyRename(i){const s=state.sessions.find(x=>x.id===i),v=document.getElementById('renameInput').value.trim();if(v){s.title=v;s.updated=now();saveState();render();closeModal()}}
+function deleteChat(i){
+  if(state.sessions.length===1)return toast('마지막 채팅은 삭제할 수 없습니다.');
+  if(!confirm('이 채팅을 삭제할까요?'))return;
+  state.sessions=state.sessions.filter(x=>x.id!==i);
+  if(state.active===i)state.active=state.sessions[0].id;
+  saveState();render();
+}
+function renderList(){
+  const q=document.getElementById('chatSearch').value.toLowerCase();
+  const arr=state.sessions.filter(s=>!q||s.title.toLowerCase().includes(q)||s.messages.some(m=>m.text.toLowerCase().includes(q)))
+    .sort((a,b)=>(b.pinned-a.pinned)||(b.updated.localeCompare(a.updated)));
+  document.getElementById('chatList').innerHTML=arr.map(s=>`
+    <div class="chatItem ${s.id===state.active?'active':''}">
+      <span class="chatName" onclick="selectChat('${s.id}')">${s.pinned?'📌 ':''}${esc(s.title)}</span>
+      <button class="iconBtn" onclick="renameChat('${s.id}')">✎</button>
+      <button class="iconBtn" onclick="pinChat('${s.id}')">${s.pinned?'📌':'☆'}</button>
+      <button class="iconBtn" onclick="deleteChat('${s.id}')">×</button>
+    </div>`).join('');
+  const u=currentUser();document.getElementById('sideUser').textContent=u?`● ${u.nick} 로그인됨`:'로그인 필요';
+}
+function renderChat(){
+  const s=current();document.getElementById('chatTitle').textContent=s.title;
+  const c=document.getElementById('chatArea');
+  if(!s.messages.length){
+    c.innerHTML=`<div class="welcome"><div class="logoBig">N</div><h1>nexa_01</h1>
+    <p>질문의 전체 문맥을 분석하고 관련 자료를 찾아 답변합니다.<br>Wikipedia 검색 + Exact / Token / Fuse 엔진 + luna_01 연결</p>
+    <div class="examples">
+      <button class="example" onclick="askExample('인공지능이란?')">인공지능이란?</button>
+      <button class="example" onclick="askExample('대한민국의 수도는?')">대한민국의 수도는?</button>
+      <button class="example" onclick="askExample('태양계는 무엇인가?')">태양계는?</button>
+    </div></div>`;
+    return;
+  }
+  c.innerHTML=s.messages.map(m=>{
+    if(m.role==='user')return `<div class="msg user"><div class="msgInner"><div class="bubble" style="color:${esc(state.profile.color)}">${esc(m.text)}</div><div class="meta">${esc(m.time)}</div></div></div>`;
+    const src=m.sources?.length?`<details class="sources"><summary>출처 ${m.sources.length}개를 검색함</summary>${m.sources.map(x=>`<div class="source"><b>${esc(x.title)}</b>${esc(x.snippet)}</div>`).join('')}</details>`:'';
+    return `<div class="msg assistant"><div class="msgInner"><div class="bubble">${esc(m.text)}</div>${src}<div class="meta">${esc(m.time)}</div></div></div>`;
+  }).join('');
+  c.scrollTop=c.scrollHeight;
+}
+function askExample(q){document.getElementById('question').value=q;send()}
+
+function tokens(q){return q.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(x=>x.length>1)}
+function relevance(q,d){
+  const h=(d.title+' '+d.text).toLowerCase(),ts=tokens(q),lower=q.toLowerCase();
+  let n=0;
+  if(h.includes(lower))n+=12;
+  ts.forEach(w=>{if(h.includes(w))n+=w.length>=4?3:1});
+  const title=d.title.toLowerCase();ts.forEach(w=>{if(title.includes(w))n+=4});
+  return n;
+}
+async function wikiSearch(q,limit=8){
+  const p=new URLSearchParams({action:'query',format:'json',origin:'*',generator:'search',gsrsearch:q,gsrnamespace:'0',gsrlimit:String(limit),prop:'extracts',explaintext:'1',exchars:'1800'});
+  const r=await fetch(WIKI+'?'+p);if(!r.ok)throw Error('wiki');
+  const d=await r.json();
+  return Object.values(d.query?.pages||{}).map(x=>({title:x.title,text:x.extract||'',url:'https://ko.wikipedia.org/wiki/'+encodeURIComponent(x.title)}));
+}
+async function searchAll(q){
+  const t=tokens(q);
+  const queries=[q,t.slice(0,10).join(' '),t.sort((a,b)=>b.length-a.length).slice(0,7).join(' ')];
+  const engines=['Exact','Token','Fuse'],all=[];
+  for(let i=0;i<queries.length;i++){
+    if(!queries[i])continue;
+    try{const docs=await wikiSearch(queries[i]);docs.forEach(d=>all.push({...d,engine:engines[i],score:relevance(q,d)}))}catch(e){}
+  }
+  const map=new Map();
+  all.forEach(d=>{const old=map.get(d.title);if(!old||d.score>old.score)map.set(d.title,d)});
+  return [...map.values()].sort((a,b)=>b.score-a.score).slice(0,8);
+}
+function localAnswer(q,docs){
+  if(!docs.length)return '관련 Wikipedia 자료를 찾지 못했습니다.\n질문의 핵심 단어나 표현을 조금 바꿔 다시 검색해 보세요.';
+  const lines=['질문의 전체 문맥을 기준으로 검색했습니다.',''];
+  docs.slice(0,3).forEach(d=>lines.push('• '+d.title+': '+d.text.replace(/\s+/g,' ').slice(0,430)));
+  lines.push('','위 내용은 검색된 자료를 바탕으로 정리한 답변입니다.');
+  return lines.slice(0,16).join('\n');
+}
+async function askServer(q,docs,files){
+  if(!state.api)return null;
+  const r=await fetch(state.api.replace(/\/$/,'')+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({app:APP,server:SERVER,question:q,context:docs.slice(0,5),files:files||[]})});
+  if(!r.ok)throw Error('server');
+  const x=await r.json();return x.answer||x.output||null;
+}
+async function send(){
+  if(!ensureLogin())return;
+  const box=document.getElementById('question'),q=box.value.trim();if(!q)return;
+  const s=current();
+  if(!s.messages.length||s.title==='새 채팅')s.title=q.length>30?q.slice(0,30)+'…':q;
+  s.messages.push({role:'user',text:q,time:now()});
+  s.messages.push({role:'assistant',text:'검색하고 분석하는 중…',time:''});
+  box.value='';box.style.height='56px';saveState();renderChat();
+  try{
+    const docs=await searchAll(q);
+    let answer=null;
+    try{answer=await askServer(q,docs,s.files)}catch(e){}
+    const m=s.messages[s.messages.length-1];
+    m.text=answer||localAnswer(q,docs);
+    m.sources=docs.slice(0,5).map(d=>({title:d.title,snippet:d.text.replace(/\s+/g,' ').slice(0,260),url:d.url}));
+    m.time=now();s.updated=now();saveState();render();
+  }catch(e){
+    const m=s.messages[s.messages.length-1];m.text='검색 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.';m.time=now();saveState();render();
+  }
+}
+document.getElementById('question').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
+document.getElementById('question').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=Math.min(170,e.target.scrollHeight)+'px'});
+document.getElementById('chatSearch').addEventListener('input',renderList);
+
+document.getElementById('fileInput').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  const s=current();pendingFile={id:uid(),name:f.name,size:f.size,type:f.type,content:''};
+  if(/^(text\/|application\/json|text\/csv)/i.test(f.type)||/\.(txt|md|csv|json|html|js|css)$/i.test(f.name)){
+    try{pendingFile.content=(await f.text()).slice(0,20000)}catch(x){}
+  }
+  s.files.push(pendingFile);saveState();
+  document.getElementById('fileName').textContent=f.name;
+  document.getElementById('clearFile').classList.remove('hide');
+  toast('파일이 첨부되었습니다.');
+});
+function clearFile(){
+  const s=current();if(pendingFile)s.files=s.files.filter(x=>x.id!==pendingFile.id);
+  pendingFile=null;document.getElementById('fileInput').value='';document.getElementById('fileName').textContent='';document.getElementById('clearFile').classList.add('hide');saveState();
+}
+
+function openModal(html){document.getElementById('modal').innerHTML=html;document.getElementById('modalBack').classList.add('show')}
+function closeModal(){document.getElementById('modalBack').classList.remove('show')}
+document.getElementById('modalBack').addEventListener('click',e=>{if(e.target.id==='modalBack')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+function savedModal(){
+  const arr=state.sessions.slice().sort((a,b)=>(b.pinned-a.pinned)||b.updated.localeCompare(a.updated));
+  openModal(`<div class="modalHead"><h2>저장된 대화</h2><button class="close" onclick="closeModal()">×</button></div>
+  <div class="savedList">${arr.map(s=>`<div class="savedItem"><span>${s.pinned?'📌 ':''}${esc(s.title)}</span><button class="secondary" onclick="selectChat('${s.id}');closeModal()">열기</button></div>`).join('')}</div>`);
+}
+function profileModal(){
+  const u=currentUser();
+  openModal(`<div class="modalHead"><h2>프로필</h2><button class="close" onclick="closeModal()">×</button></div>
+  <div class="field"><label>표시 이름</label><input id="profileName" value="${esc(state.profile.name)}"></div>
+  <div class="field"><label>질문 글자색</label><input id="profileColor" type="color" value="${esc(state.profile.color)}"></div>
+  <div class="actions"><button class="primary" onclick="saveProfile()">저장</button></div>
+  <p class="notice">${u?`로그인: ${esc(u.nick)}`:'로그아웃 상태'}</p>`);
+}
+function saveProfile(){
+  state.profile.name=document.getElementById('profileName').value.trim()||'사용자';
+  state.profile.color=document.getElementById('profileColor').value;saveState();closeModal();render();toast('프로필 저장 완료');
+}
+function settingsModal(){
+  openModal(`<div class="modalHead"><h2>설정</h2><button class="close" onclick="closeModal()">×</button></div>
+  <div class="field"><label>luna_01 서버 주소</label><input id="apiUrl" value="${esc(state.api)}" placeholder="https://your-server.example"></div>
+  <p class="notice">API 키는 GitHub Pages HTML에 넣지 않습니다. 실제 AI 기능은 luna_01 서버에서 처리하도록 구성합니다.</p>
+  <div class="actions"><button class="secondary" onclick="testServerFromModal()">연결 테스트</button><button class="primary" onclick="saveSettings()">저장</button></div>`);
+}
+function saveSettings(){
+  state.api=document.getElementById('apiUrl').value.trim().replace(/\/$/,'');saveState();closeModal();checkServer();toast('설정 저장 완료');
+}
+async function testServerFromModal(){
+  const u=document.getElementById('apiUrl').value.trim().replace(/\/$/,'');if(!u)return toast('서버 주소를 입력하세요.');
+  try{const r=await fetch(u+'/api/health',{cache:'no-store'});if(!r.ok)throw Error();toast('luna_01 연결 성공')}catch(e){toast('연결 실패')}
+}
+async function checkServer(){
+  const el=document.getElementById('serverStatus');
+  if(!state.api){el.textContent='● luna_01 미연결';return}
+  try{const r=await fetch(state.api.replace(/\/$/,'')+'/api/health',{cache:'no-store'});if(!r.ok)throw Error();const d=await r.json();el.textContent='● '+(d.server||SERVER)+' 연결됨'}catch(e){el.textContent='● luna_01 미연결'}
+}
+function toggleSidebar(v){
+  const e=document.getElementById('sidebar');
+  if(v===false)e.classList.remove('open');else e.classList.toggle('open');
+}
+function render(){renderList();renderChat();const u=currentUser();if(u)document.getElementById('auth').classList.add('hide');else document.getElementById('auth').classList.remove('hide')}
+async function init(){
+  newCaptcha();
+  const u=currentUser();
+  if(u){state.profile.name=u.nick||state.profile.name;saveState();document.getElementById('auth').classList.add('hide')}
+  render();checkServer();
+}
+init();
+</script>
+</body>
+</html>
